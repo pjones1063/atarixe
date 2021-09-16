@@ -4,7 +4,7 @@
 	
 Start
 	jsr printf
-	.byte 125,155,'130 XE Extendted Test ',155, 155, 155,0
+	.byte 125,155,'130 XE Extended Memory Test ',155, 155, 155,0
 	
 	jsr printf
 	.byte 'Write > bank 0 ',155,0
