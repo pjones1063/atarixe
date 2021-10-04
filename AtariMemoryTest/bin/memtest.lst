@@ -1,0 +1,638 @@
+mads 2.1.3
+Source: /home/paul/eclipse-workspace/AtariMemoryTest/memtest.asm
+     1 					icl 	'printf_sym.asm'	
+Source: /home/paul/eclipse-workspace/AtariMemoryTest/printf_sym.asm
+     1 				;
+     2 				;  This program is free software; you can redistribute it and/or modify
+     3 				;  it under the terms of the GNU General Public License as published by
+     4 				;  the Free Software Foundation; either version 2 of the License, or
+     5 				;  (at your option) any later version.
+     6 				;
+     7 				;  This program is distributed in the hope that it will be useful,
+     8 				;  but WITHOUT ANY WARRANTY; without even the implied warranty of
+     9 				;  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    10 				;  GNU General Public License for more details.
+    11 				;
+    12 				;  You should have received a copy of the GNU General Public License
+    13 				;  along with this program; if not, write to the Free Software
+    14 				;  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+    15 				;
+    16
+    17 = 0300			DDEVIC	equ $0300
+    18 = 0301			DUNIT	equ $0301
+    19 = 0302			DCOMND	equ $0302
+    20 = 0303			DSTATS	equ $0303
+    21 = 0304			DBUFLO	equ $0304
+    22 = 0305			DBUFHI	equ $0305
+    23 = 0306			DTIMLO	equ $0306
+    24 = 0307			DUNUSE	equ $0307
+    25 = 0308			DBYTLO	equ $0308
+    26 = 0309			DBYTHI	equ $0309
+    27 = 030A			DAUX1	equ $030A
+    28 = 030B			DAUX2	equ $030B
+    29 = 003C			NOCKSM	equ $003C
+    30
+    31 = 0342			iccom	equ $0342
+    32 = 0344			icbadr	equ $0344
+    33 = 0346			icptl	equ $0346
+    34 = 0347			icpth	equ $0347
+    35 = 0348			icblen	equ $0348
+    36 = 034A			icaux1	equ $034A
+    37 = 034B			icaux2	equ $034B
+    38
+    39 = E456			ciov	equ $E456
+    40 = D301			portb	equ $D301
+    41
+    42 = 4000			xebank  equ $4000
+    43
+    44 = 00E1			b0      equ $E1
+    45 = 00E5			b1      equ $E5
+    46 = 00E9			b2      equ $E9
+    47 = 00ED			b3      equ $ED 
+    48
+    49 = 077B			dday    equ $077B
+    50 = 077C			dmth    equ $077C
+    51 = 077D			dyer    equ $077D
+    52 = 077E			dhrs    equ $077E
+    53 = 077F			dmin    equ $077F
+    54 = 0780			dsec    equ $0780
+    55
+    56 = 000A			DOSVEC	equ $0A
+    57 = 000C			DOSINI	equ $0C
+    58
+    59 = E459			SIOV	equ $E459
+    60
+    61
+    62 = 0021			comfnam	equ $21
+    63 = 000A			comtab	equ $0A
+    64
+    65 					org $80
+    66 = 0080			Temp1			.ds 2
+    67 = 0082			Temp2			.ds 2
+    68 = 0084			Temp3			.ds 2
+    69 = 0086			Temp4			.ds 2
+    70 = 0088			LeadingZeroFlag	.ds 1
+    71 = 0089			ArgIndex		.ds 1
+    72 = 008A			FieldWidth		.ds 1
+    73 = 008B			StringIndex		.ds 1
+    74 					
+    75
+    76 					
+    77 				.macro ldyx
+    78 					ldy #< :1
+    79 					ldx #> :1
+    80 				.endm
+    81
+    82 				.macro styx
+    83 					sty :1
+    84 					stx :1+1
+    85 				.endm
+    86
+    87 				.macro ldax
+    88 					lda #< :1
+    89 					ldx #> :1
+    90 				.endm
+    91
+    92 				.macro stax
+    93 				 	sta :1
+    94 				 	stx :1+1
+    95 				.endm
+     2 						
+     3 					org $3400
+     4 					
+     5 				Start
+     6 FFFF> 3400-3622> 20 3C + 	jsr printf
+     7 3403 7D 9B 31 33 30 20 + 	.byte 125,155,'130 XE Extended Memory Test ',155, 155, 155,0
+     8 					
+     9 3425 20 3C 36			jsr printf
+    10 3428 57 72 69 74 65 20 + 	.byte 'Write > bank 0 ',155,0
+    11 3439 A9 E1			lda #b0
+    12 343B 20 7D 35		    jsr loadbank
+    13 				 
+    14 343E 20 3C 36		 	jsr printf
+    15 3441 57 72 69 74 65 20 +  	.byte 'Write > bank 1 ',155,0
+    16 3452 A9 E5			lda #b1
+    17 3454 20 7D 35			jsr loadbank
+    18
+    19 3457 20 3C 36			jsr printf
+    20 345A 57 72 69 74 65 20 + 	.byte 'Write > bank 2 ',155,0
+    21 346B A9 E9			lda #b2
+    22 346D 20 7D 35			jsr loadbank
+    23
+    24 3470 8D 23 36			sta bank	
+    25 3473 20 3C 36			jsr printf
+    26 3476 57 72 69 74 65 20 + 	.byte 'Write > bank 3 ',155,155,0
+    27 3488 A9 ED			lda #b3
+    28 348A 20 7D 35			jsr loadbank
+    29 					
+    30 				// --
+    31
+    32 348D 20 3C 36			jsr printf
+    33 3490 52 65 61 64 20 20 + 	.byte 'Read  > bank 0                 ',155,0
+    34 34B1 A9 E1		 	lda #b0
+    35 34B3 20 A1 35		    jsr readbank
+    36
+    37 34B6 20 3C 36		 	jsr printf
+    38 34B9 52 65 61 64 20 20 +  	.byte 'Read  > bank 1                  ',155,0
+    39 34DB A9 E5			lda #b1
+    40 34DD 20 A1 35		 	jsr readbank
+    41 					
+    42 34E0 20 3C 36			jsr printf	
+    43 34E3 52 65 61 64 20 20 + 	.byte 'Read  > bank 2                  ',155,0
+    44 3505 A9 E9			lda #b2
+    45 3507 20 A1 35		 	jsr readbank
+    46
+    47 350A 20 3C 36			jsr printf
+    48 350D 52 65 61 64 20 20 + 	.byte 'Read  > bank 3                  ',155,0
+    49 352F A9 ED			lda #b3
+    50 3531 20 A1 35		 	jsr readbank
+    51
+    52 3534 20 3C 36			jsr printf
+    53 3537 20 20 20 20 20 20 + 	.byte '                                ',28,155
+    54 3559 9B 9B 41 6C 6C 20 + 	.byte 155,155,'All Banks Tested -  Passed ',155,155,155,0
+    55
+    56 357A 4C 04 36			jmp Exit
+    57 					
+    58 357D			.proc loadbank
+    59 357D 8D 23 36			sta bank
+    60 3580 8D 01 D3			STA portb
+    61 3583 A9 40			LDA #>xebank
+    62 3585 8D 92 35			STA ix+2
+    63 3588 A2 00			LDX #$00
+    64 358A 8E 91 35			STX ix+1	
+    65 358D AD 23 36		lp1	LDA bank		    
+    66 3590 9D 00 40		ix: STA xebank,x
+    67 3593 E8			    INX
+    68 3594 D0 FA		    BNE ix
+    69 3596 EE 92 35			INC ix+2
+    70 3599 AD 92 35			LDA ix+2
+    71 359C C9 80			CMP #$80
+    72 359E D0 ED			BNE lp1
+    73 35A0 60				RTS
+    74 				.endp
+    75
+    76 35A1			.proc readbank
+    77 35A1 8D 23 36			STA bank		    		    
+    78 35A4 8D 01 D3			STA portb
+    79 35A7 A9 40			LDA #>xebank
+    80 35A9 8D DC 35			STA iy+2
+    81 35AC A2 00			LDX #$00
+    82 35AE 8E DB 35			STX iy+1
+    83 35B1			lp2	
+    84 35B1 20 3C 36			jsr Printf
+    85 35B4 20 20 25 78 20 2D + 	.byte '  %x -> Testing Block - %x00',28,155,0
+    86 35D3 23 36			.word bank 
+    87 35D5 DC 35			.word iy+2
+    88 35D7 AD 23 36			LDA bank
+    89 35DA DD 00 40		iy: CMP xebank,x
+    90 35DD D0 0E		    BNE ExitError
+    91 35DF E8			    INX    
+    92 35E0 D0 F8		    BNE iy 
+    93 35E2 EE DC 35			INC iy+2
+    94 35E5 AD DC 35			LDA iy+2
+    95 35E8 C9 80			CMP #$80
+    96 35EA D0 C5			BNE lp2
+    97 35EC 60				RTS
+    98 				.endp	
+    99
+   100 35ED			ExitError:
+   101 35ED 20 3C 36			jsr Printf
+   102 35F0 9B 9B 9B 65 72 72 + 	.byte 155,155,155,'error in memory',155,0	
+   103 3604			.proc Exit
+   104 3604 20 3C 36			jsr Printf
+   105 3607 9B 50 72 65 73 73 + 	.byte 155,'Press a key to quit',155,0
+   106 361D 20 B4 37			jsr Input1
+   107 3620 6C 0A 00			jmp (DOSVEC)
+   108 				.endp
+   109 					
+   110 = 3623			bank .ds 1 
+   111 					
+   112 3624			    icl 'printf.asm'      
+Source: /home/paul/eclipse-workspace/AtariMemoryTest/printf.asm
+     1 				;  printf.s - AspeQT printf library
+     2 				;
+     3 				;  Copyright (c) 2016 by Jonathan Halliday <fjc@atari8.co.uk>
+     4 				;
+     5 				;  This program is free software; you can redistribute it and/or modify
+     6 				;  it under the terms of the GNU General Public License as published by
+     7 				;  the Free Software Foundation; either version 2 of the License, or
+     8 				;  (at your option) any later version.
+     9 				;
+    10 				;  This program is distributed in the hope that it will be useful,
+    11 				;  but WITHOUT ANY WARRANTY; without even the implied warranty of
+    12 				;  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    13 				;  GNU General Public License for more details.
+    14 				;
+    15 				;  You should have received a copy of the GNU General Public License
+    16 				;  along with this program; if not, write to the Free Software
+    17 				;  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+    18 				;
+    19
+    20 				//
+    21 				//	Tiny Printf
+    22 				//	Temp1: String pointer
+    23 				//	Temp3: Arg pointer
+    24 				//	ArgIndex: index into args (offset from start of string)
+    25 				//	StringIndex: index into string
+    26 				//
+    27
+    28
+    29 				//
+    30 				//	Get pointer to next arg in Temp3
+    31 				//
+    32
+    33 3624				.proc GetNextArg
+    34 3624-3800> A4 89			ldy ArgIndex
+    35 3626 B1 80			lda (Temp1),y
+    36 3628 85 84			sta Temp3
+    37 362A C8				iny
+    38 362B B1 80			lda (Temp1),y
+    39 362D 85 85			sta Temp3+1
+    40 362F C8				iny
+    41 3630 84 89			sty ArgIndex
+    42 3632 A0 00			ldy #0		; leave 0 in Y
+    43 3634 60				rts
+    44 					.endp
+    45
+    46
+    47 				//
+    48 				//	Create arg pointer
+    49 				//
+    50
+    51 3635				.proc GetArgPointer
+    52 3635 20 57 36			jsr StrLen	; step past string argument
+    53 3638 C8				iny		; skip trailing NUL
+    54 3639 84 89			sty ArgIndex
+    55 363B 60				rts
+    56 					.endp
+    57
+    58
+    59
+    60
+    61 				//
+    62 				//	In-line entry point
+    63 				//
+    64
+    65 363C				.proc Printf
+    66 363C 68				pla		; get address of in-line string
+    67 363D 18				clc
+    68 363E 69 01			adc #1
+    69 3640 A8				tay		; save LSB	
+    70 3641 68				pla		; get MSB
+    71 3642 69 00			adc #0
+    72 3644 AA				tax		; put MSB in X
+    73 3645 98				tya		; put LSB in A
+    74 3646 20 5F 36			jsr PrintfAX	; Main expects string address in A,X
+    75 3649			Return
+    76 3649 A5 80			lda Temp1
+    77 364B 18				clc
+    78 364C 65 89			adc ArgIndex
+    79 364E 85 80			sta Temp1
+    80 3650 90 02			bcc @+
+    81 3652 E6 81			inc Temp1+1
+    82 				@
+    83 3654 6C 80 00			jmp (Temp1)
+    84 					.endp
+    85
+    86
+    87
+    88 				//
+    89 				//	Get string length
+    90 				//
+    91
+    92 3657				.proc StrLen
+    93 3657 A0 FF			ldy #$FF
+    94 				@
+    95 3659 C8				iny
+    96 365A B1 80			lda (Temp1),y
+    97 365C D0 FB			bne @-
+    98 365E 60				rts
+    99 					.endp
+   100 					
+   101
+   102 365F				.proc PrintfAX
+   103 365F				stax Temp1
+Macro: STAX [Source: /home/paul/eclipse-workspace/AtariMemoryTest/printf_sym.asm]
+     1 365F 85 80		 	sta TEMP1
+     2 3661 86 81		 	stx TEMP1+1
+Source: /home/paul/eclipse-workspace/AtariMemoryTest/printf.asm
+   104 3663			NoAX
+   105 3663 A9 00			lda #0
+   106 3665 85 8B			sta StringIndex
+   107 3667 20 35 36			jsr GetArgPointer
+   108 366A			Loop
+   109 366A A4 8B			ldy StringIndex
+   110 366C B1 80			lda (Temp1),y
+   111 366E F0 4B			beq Done
+   112 3670 C9 25			cmp #'%'
+   113 3672 D0 40			bne PrintChar
+   114 3674 E6 8B			inc StringIndex
+   115 3676 C8				iny
+   116 3677 B1 80			lda (Temp1),y
+   117 3679 F0 40			beq Done
+   118 367B C9 25			cmp #'%'
+   119 367D F0 35			beq PrintChar
+   120 367F 20 C0 36			jsr GetFieldWidth
+   121 3682 B1 80			lda (Temp1),y
+   122 3684 AE A4 36			ldx PFControlTab
+   123 3687			FindIt
+   124 3687 DD A4 36			cmp PFControlTab,x
+   125 368A F0 05			beq FoundIt
+   126 368C CA				dex
+   127 368D D0 F8			bne FindIt
+   128 368F F0 26			beq NextChar
+   129 					
+   130 3691			FoundIt
+   131 3691 A9 36			lda #> [NextChar-1]
+   132 3693 48				pha
+   133 3694 A9 B6			lda #< [NextChar-1]
+   134 3696 48				pha
+   135 3697 CA				dex
+   136 3698 8A				txa
+   137 3699 0A				asl
+   138 369A AA				tax
+   139 369B BD AB 36			lda PFControlAddr+1,x
+   140 369E 48				pha
+   141 369F BD AA 36			lda PFControlAddr,x
+   142 36A2 48				pha
+   143 36A3 60				rts
+   144 				 
+   145
+   146 36A4			PFControlTab
+   147 36A4 05				.byte 5
+   148 36A5 63 70 73 62 78		.byte 'cpsbx'
+   149 36AA			PFControlAddr
+   150 36AA F0 36			.word PfChar-1
+   151 36AC 01 37			.word PfPtr-1
+   152 36AE 13 37			.word PfString-1
+   153 36B0 4A 37			.word PfByte-1
+   154 36B2 19 37			.word PfHex-1
+   155
+   156 36B4			PrintChar
+   157 36B4 20 8D 37			jsr PutChar
+   158 36B7			NextChar
+   159 36B7 E6 8B			inc StringIndex
+   160 36B9 D0 AF			bne Loop
+   161 36BB			Done
+   162 36BB A9 00 85 83			mva #0 Temp2+1
+   163 36BF 60				rts
+   164 					.endp
+   165
+   166
+   167
+   168 36C0				.proc GetFieldWidth
+   169 36C0 A9 00			lda #0
+   170 36C2 85 8A			sta FieldWidth
+   171 36C4 85 88			sta LeadingZeroFlag
+   172 36C6 AA				tax
+   173 36C7			Loop
+   174 36C7 B1 80			lda (Temp1),y
+   175 36C9 C9 3A			cmp #'9'+1
+   176 36CB B0 21			bcs Done
+   177 36CD 38				sec
+   178 36CE E9 30			sbc #'0'
+   179 36D0 90 1C			bcc Done	
+   180 36D2 D0 06			bne @+
+   181 36D4 E0 00			cpx #0		; if first field width digit is zero, set leading zero flag
+   182 36D6 D0 02			bne @+
+   183 36D8 C6 88			dec LeadingZeroFlag
+   184 				@
+   185 36DA 85 84			sta Temp3
+   186 36DC A5 8A			lda FieldWidth
+   187 36DE 0A				asl @		; fieldwidth * 2
+   188 36DF 85 85			sta Temp3+1
+   189 36E1 0A				asl @
+   190 36E2 0A				asl @		; fieldwidth * 8
+   191 36E3 18				clc
+   192 36E4 65 85			adc Temp3+1	; (fieldwidth*2) + (fieldwidth*8)
+   193 36E6 65 84			adc Temp3	; add in units
+   194 36E8 85 8A			sta FieldWidth
+   195 36EA E8				inx
+   196 36EB C8				iny
+   197 36EC D0 D9			bne Loop
+   198 36EE			Done
+   199 36EE 84 8B			sty StringIndex
+   200 36F0 60				rts
+   201 					.endp
+   202 					
+   203 					
+   204
+   205 36F1				.proc PfChar
+   206 36F1 20 24 36			jsr GetNextArg	; leaves 0 in Y
+   207 36F4 B1 84			lda (Temp3),y
+   208 36F6 A6 8A			ldx FieldWidth
+   209 36F8 D0 01			bne Loop
+   210 36FA E8				inx
+   211 36FB			Loop
+   212 36FB 20 8D 37			jsr PutChar	; doesn't clobber registers
+   213 36FE CA				dex
+   214 36FF D0 FA			bne Loop
+   215 3701 60				rts
+   216 					.endp
+   217
+   218
+   219
+   220 3702				.proc PfPtr
+   221 3702 20 24 36			jsr GetNextArg
+   222 3705 A0 01			ldy #1
+   223 3707 B1 84			lda (Temp3),y
+   224 3709 AA				tax
+   225 370A 88				dey
+   226 370B B1 84			lda (Temp3),y
+   227 370D 85 84			sta Temp3
+   228 370F 86 85			stx Temp3+1
+   229 3711 4C 80 37			jmp PFPrintStr
+   230 					.endp
+   231
+   232
+   233
+   234 3714				.proc PfString
+   235 3714 20 24 36			jsr GetNextArg
+   236 3717 4C 80 37			jmp PFPrintStr
+   237 					.endp
+   238
+   239
+   240 					
+   241 				//
+   242 				//	Display Hex/BCD
+   243 				//
+   244
+   245 371A				.proc PfHex
+   246 371A 20 24 36			jsr GetNextArg
+   247 371D B1 84			lda (Temp3),y
+   248 371F 48				pha
+   249 3720 4A				lsr @
+   250 3721 4A				lsr @
+   251 3722 4A				lsr @
+   252 3723 4A				lsr @
+   253 3724 D0 04			bne NotZero
+   254 3726 24 88			bit LeadingZeroFlag
+   255 3728 10 07			bpl @+
+   256 372A			NotZero
+   257 372A A8				tay
+   258 372B B9 3B 37			lda HexTable,y
+   259 372E 20 8D 37			jsr PutChar
+   260 				@
+   261 3731 68				pla
+   262 3732 29 0F			and #$0F
+   263 3734 A8				tay
+   264 3735 B9 3B 37			lda HexTable,y
+   265 3738 4C 8D 37			jmp PutChar
+   266 373B			HexTable
+   267 373B 30 31 32 33 34 35 + 	.byte '0123456789ABDCEF'
+   268 					.endp
+   269
+   270
+   271
+   272
+   273 				//
+   274 				//	Display decimal byte
+   275 				//
+   276
+   277 374B				.proc PfByte
+   278 374B 20 24 36			jsr GetNextArg
+   279 374E B1 84			lda (Temp3),y
+   280 3750 A2 00			ldx #0
+   281 3752			Loop1
+   282 3752 C9 64			cmp #100
+   283 3754 90 05			bcc HundredsDone
+   284 3756 E9 64			sbc #100
+   285 3758 E8				inx
+   286 3759 D0 F7			bne Loop1
+   287 375B			HundredsDone
+   288 375B 48				pha	; save remainder
+   289 375C 8A				txa
+   290 375D F0 03			seq
+   291 375F 20 76 37			jsr PutDigit
+   292 3762 68				pla
+   293 3763 A2 00			ldx #0
+   294 3765			Loop
+   295 3765 C9 0A			cmp #10
+   296 3767 90 05			bcc TensDone
+   297 3769 E9 0A			sbc #10
+   298 376B E8				inx
+   299 376C D0 F7			bne Loop
+   300 376E			TensDone
+   301 376E 48				pha
+   302 376F 8A				txa
+   303 3770 F0 03			seq
+   304 3772 20 76 37			jsr PutDigit
+   305 3775 68				pla
+   306 3776			PutDigit
+   307 3776 18				clc
+   308 3777 69 30			adc #'0'
+   309 3779 4C 8D 37			jmp PutChar
+   310 					.endp	
+   311 					
+   312 					
+   313 					
+   314 					
+   315
+   316 				//
+   317 				//	Print plain string in A,X
+   318 				//
+   319 					
+   320 377C				.proc PutStrAX
+   321 377C				stax Temp3	; fall into PFPrintStr
+Macro: STAX [Source: /home/paul/eclipse-workspace/AtariMemoryTest/printf_sym.asm]
+     1 377C 85 84		 	sta TEMP3
+     2 377E 86 85		 	stx TEMP3+1
+Source: /home/paul/eclipse-workspace/AtariMemoryTest/printf.asm
+   322 					.endp
+   323
+   324
+   325 3780				.proc PFPrintStr
+   326 3780 A0 00			ldy #0
+   327 				@
+   328 3782 B1 84			lda (Temp3),y
+   329 3784 F0 06			beq Done
+   330 3786 20 8D 37			jsr PutChar
+   331 3789 C8				iny
+   332 378A D0 F6			bne @-
+   333 378C			Done
+   334 378C 60				rts
+   335 					.endp
+   336 					
+   337 					
+   338
+   339 					
+   340 				//
+   341 				//	Put character
+   342 				//
+   343
+   344 378D				.proc PutChar
+   345 378D 84 86			sty Temp4
+   346 378F 86 87			stx Temp4+1
+   347 3791 48				pha
+   348 3792 A9 00			lda #0
+   349 3794 AA				tax
+   350 3795 9D 48 03			sta icblen,x
+   351 3798 9D 49 03			sta icblen+1,x
+   352 379B A9 0B 9D 42 03		mva #$0B iccom,x
+   353 37A0 68				pla
+   354 37A1 20 56 E4			jsr ciov
+   355 37A4 A4 86			ldy Temp4
+   356 37A6 A6 87			ldx Temp4+1
+   357 37A8 60				rts
+   358 					.endp
+   359
+   360 					
+   361 37A9				.proc ToUpper
+   362 37A9 C9 7B			cmp #'z'+1
+   363 37AB B0 06			bcs NLow
+   364 37AD C9 61			cmp #'a'
+   365 37AF 90 02			bcc NLow
+   366 37B1 E9 20			sbc #32
+   367 37B3			NLow
+   368 37B3 60				rts
+   369 					.endp
+   370 					
+   371
+   372 				//
+   373 				//	input 1 character
+   374 				//
+   375 37B4				.proc Input1
+   376 37B4 20 DA 37			jsr Input
+   377 37B7 C0 03			cpy #03
+   378 37B9 30 1D			bmi ok1
+   379 37BB 20 3C 36			jsr Printf
+   380 37BE 9B 45 6E 74 65 72 + 	.byte 155,'Enter only 1 character',0
+   381 37D6 38				sec
+   382 37D7 60				rts
+   383 37D8			ok1
+   384 37D8 18			    clc
+   385 37D9 60				rts
+   386 					.endp
+   387
+   388 						
+   389 				//
+   390 				//	input characters
+   391 				//				
+   392 37DA				.proc Input
+   393 37DA A9 00			lda #0
+   394 37DC AA				tax
+   395 37DD A9 FF			lda #$ff
+   396 37DF 9D 48 03			sta icblen,x
+   397 37E2 A9 00			lda #$00
+   398 37E4 9D 49 03			sta icblen+1,x
+   399 37E7 A9 00			lda #< [InputBuf]
+   400 37E9 9D 44 03			sta icbadr,x
+   401 37EC A9 39			lda #> [InputBuf]
+   402 37EE 9D 45 03			sta icbadr+1,x
+   403 37F1 A9 05 9D 42 03		mva #$05 iccom,x
+   404 37F6 20 56 E4			jsr ciov
+   405 37F9 AD 00 39		    lda InputBuf
+   406 37FC BC 48 03		    ldy icblen,x
+   407 37FF 18			    clc
+   408 3800 60				rts
+   409 					.endp
+   410 					
+   411 = 3801			IOBuf			.ds 252
+   412 = 38FD			IOFileOption 	.ds   1	
+   413 = 38FE			IOLastFile		.ds   2			
+   414 = 3900			InputBuf 		.ds 255
+   415
+   416 					
+   113 					
+   114 02E0-02E1> 00 34			run Start
+   115 					

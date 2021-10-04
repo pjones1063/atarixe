@@ -9,7 +9,7 @@ Start
 	jsr printf
 	.byte 'Write > bank 0 ',155,0
 	lda #b0
-    jsr loadbank
+	jsr loadbank
  
  	jsr printf
  	.byte 'Write > bank 1 ',155,0
@@ -30,71 +30,71 @@ Start
 // --
 
 	jsr printf
-	.byte 'Read  > bank 0                 ',155,0
+	.byte 'Read  > bank 0              ',155,0
  	lda #b0
-    jsr readbank
+	jsr readbank
 
  	jsr printf
- 	.byte 'Read  > bank 1                  ',155,0
+ 	.byte 'Read  > bank 1              ',155,0
 	lda #b1
- 	jsr readbank
+	jsr readbank
 	
 	jsr printf	
-	.byte 'Read  > bank 2                  ',155,0
+	.byte 'Read  > bank 2               ',155,0
 	lda #b2
- 	jsr readbank
+	jsr readbank
 
 	jsr printf
-	.byte 'Read  > bank 3                  ',155,0
+	.byte 'Read  > bank 3               ',155,0
 	lda #b3
  	jsr readbank
 
 	jsr printf
-	.byte '                                ',28,155
+	.byte 28,155
 	.byte 155,155,'All Banks Tested -  Passed ',155,155,155,0
 
 	jmp Exit
 	
 .proc loadbank
-	STA bank
-	STA portb
-	LDA #>xebank
-	STA ix+2
-	LDX #$00
-	STX ix+1	
-lp1	LDA bank		    
-ix: STA xebank,x
-    INX
-    BNE ix
-	INC ix+2
-	LDA ix+2
-	CMP #$80
-	BNE lp1
-	RTS
+	sta bank
+	sta portb
+	lda #>xebank
+	sta ix+2
+	ldx #$00
+	stx ix+1	
+lp1	lda bank		
+	ix: sta xebank,x
+	inx
+	bne ix
+	inc ix+2
+	lda ix+2
+	cmp #$80
+	bne lp1
+	rts
 .endp
 
 .proc readbank
-	STA bank		    		    
-	STA portb
-	LDA #>xebank
-	STA iy+2
-	LDX #$00
-	STX iy+1
+	sta bank				
+	sta portb
+	lda #>xebank
+	sta iy+2
+	ldx #$00
+	stx iy+1
 lp2	
 	jsr Printf
 	.byte '  %x -> Testing Block - %x00',28,155,0
 	.word bank 
 	.word iy+2
-	LDA bank
-iy: CMP xebank,x
-    BNE ExitError
-    INX    
-    BNE iy 
-	INC iy+2
-	LDA iy+2
-	CMP #$80
-	BNE lp2
-	RTS
+	lda bank
+iy: cmp xebank,x
+	bne ExitError
+	inx
+	bne iy 
+	inc iy+2
+	lda iy+2
+	cmp #$80
+	bne lp2
+	rts
 .endp	
 
 ExitError:
@@ -109,7 +109,6 @@ ExitError:
 	
 bank .ds 1 
 	
-    icl 'printf.asm'      
-	
+	icl 'printf.asm'  
 	run Start
 	
