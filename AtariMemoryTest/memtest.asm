@@ -1,3 +1,6 @@
+;MEMTEST - 130EX Memory Bank Test
+
+
 	icl 	'printf_sym.asm'	
 		
 	org $3400
