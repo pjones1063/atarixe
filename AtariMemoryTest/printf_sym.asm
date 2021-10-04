@@ -41,10 +41,10 @@ portb	equ $D301
 
 xebank  equ $4000
 
-b0      equ $E1
-b1      equ $E5
-b2      equ $E9
-b3      equ $ED 
+b0      equ $83+$00
+b1      equ $83+$04
+b2      equ $83+$08
+b3      equ $83+$0C 
 
 dday    equ $077B
 dmth    equ $077C

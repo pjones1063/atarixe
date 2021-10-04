@@ -56,7 +56,7 @@ Start
 	jmp Exit
 	
 .proc loadbank
-	sta bank
+	STA bank
 	STA portb
 	LDA #>xebank
 	STA ix+2
