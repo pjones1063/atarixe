@@ -29,7 +29,7 @@ SOURCE  EQU     $CB             ;zero page usage
 DEST    EQU     SOURCE+2
 DOSVEC	EQU     $0A
 DOSINI	EQU     $0C
-START   EQU     $0600           ;START address
+START   EQU     $2000           ;START address
 OSROM   EQU     $C000           ;address of OS ROM start
 OSRAM   EQU     $4000           ;address of ROM destination
 NMIEN   EQU     $D40E           ;NMI enable register
@@ -91,7 +91,7 @@ Enable  PLA
         STA     NMIEN           ;reestablish NMI mask
         PLP                     ;reenable IRQs
         
-        jmp (DOSVEC)     
+        rts    
         
         run     START
              

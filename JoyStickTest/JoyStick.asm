@@ -15,7 +15,7 @@
 ;  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 ;
 	
-		icl 	'printf_sym.asm'	
+		icl 	'sym.asm'	
 
 blue	equ $a8	
 green	equ $b8	
