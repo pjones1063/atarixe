@@ -103,13 +103,13 @@ lp3	stx c1
 	cmp #7					
 	bne st1
 	iny  
-st1 cmp #11
+st1	cmp #11
 	bne st2
 	dey 
-st2 cmp #14
+st2	cmp #14
 	bne st3
 	dex 
-st3 cmp #13
+st3	cmp #13
 	bne st4
 	inx  
 st4	cpy  #200
@@ -121,11 +121,11 @@ xy1	cpy #47
 xy2	cpx #115
 	bcc xy3
 	ldx #115
-xy3 cpx #23
+xy3	cpx #23
 	bcs xy4
 	ldx #23  
-xy4
-	rts
+xy4	rts
+
 .endp
 
 .proc ticktock
