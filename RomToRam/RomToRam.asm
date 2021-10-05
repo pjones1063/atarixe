@@ -9,11 +9,22 @@
 ;  multitasking, window
 ;  management, etc.
 ;
-;    By Joe Miller.
+;  This program is free software; you can redistribute it and/or modify
+;  it under the terms of the GNU General Public License as published by
+;  the Free Software Foundation; either version 2 of the License, or
+;  (at your option) any later version.
 ;
-;This version is configured
-;as an AUTORUN.SYS file.
+;  This program is distributed in the hope that it will be useful,
+;  but WITHOUT ANY WARRANTY; without even the implied warranty of
+;  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;  GNU General Public License for more details.
 ;
+;  You should have received a copy of the GNU General Public License
+;  along with this program; if not, write to the Free Software
+;  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+;
+;
+
 SOURCE  EQU     $CB             ;zero page usage
 DEST    EQU     SOURCE+2
 DOSVEC	EQU     $0A
@@ -33,7 +44,7 @@ PORTB   EQU     $D301           ;memory mgt control latch
         LDA     #> OSRAM
         STA     DEST+1
         LDY     #0
-                                 ;Repeat
+                                ;Repeat
 Pass1   LDA     (SOURCE),Y      ;copy ROM to RAM
         STA     (DEST),Y
         INY
@@ -47,6 +58,7 @@ Pass1   LDA     (SOURCE),Y      ;copy ROM to RAM
         LDA     #$D8
         STA     SOURCE+1
         BNE     Pass1           ;Until SOURCE = $0000
+
 Swap    PHP                     ;save processor status
         SEI                     ;disable IRQs
         LDA     NMIEN
@@ -74,11 +86,12 @@ Pass2   LDA     (SOURCE),Y      ;move RAM OS to proper address
         LDA     #$D8
         STA     DEST+1
         BNE     Pass2           ;Until DEST = $000
+
 Enable  PLA
         STA     NMIEN           ;reestablish NMI mask
         PLP                     ;reenable IRQs
- ;      RTS
-  	    JMP (DOSVEC)      
+        
+        jmp (DOSVEC)     
         
         run     START
              
