@@ -8,5 +8,6 @@ Tools and utils for the Atari xe 8-bit
 
 # XE Joystick Tester:
 
-![Screenshot from 2021-10-04 20-15-31](https://user-images.githubusercontent.com/3331718/135941152-8de0336b-3e9f-42aa-808f-98a4f16dae13.png)
+![Screenshot from 2021-10-05 15-04-48](https://user-images.githubusercontent.com/3331718/136086812-d5721538-3083-4ab8-a1dc-833a184cf3e4.png)
+
 
