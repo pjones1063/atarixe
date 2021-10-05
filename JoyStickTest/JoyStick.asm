@@ -18,6 +18,7 @@
     icl 	'printf_sym.asm'	
     
 	org $2000
+
 start
     lda #$00
     sta color2
@@ -39,8 +40,7 @@ cl0	sta	p0,y
 	bne cl0
 
 loop
-	lda c0
-	sta PCOLR0	
+
 	ldy #8
 	ldx x0
 lp0	lda player,y
@@ -50,9 +50,9 @@ lp0	lda player,y
 	bne lp0
 	lda y0
 	sta HPOSP0
+	lda c0
+	sta PCOLR0	
 
-	lda c1
-	sta PCOLR1
 	ldy #8
 	ldx x1
 lp1	lda player,y
@@ -62,6 +62,8 @@ lp1	lda player,y
 	bne lp1
 	lda y1
 	sta HPOSP1
+	lda c1
+	sta PCOLR1
 
     ldx #$A8
 	lda STRIG0
@@ -88,6 +90,7 @@ lp3	stx c1
 	stx x1
 	
 	jsr ticktock
+	
 	jmp loop
 
 
