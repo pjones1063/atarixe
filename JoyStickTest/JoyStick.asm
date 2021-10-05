@@ -48,7 +48,7 @@ cl0	sta	p0,y
 loop					; move players
 	ldy #8
 	ldx x0
-lp0	lda player,y
+lp0	lda player0,y
 	sta p0,x
 	dex
 	dey
@@ -60,7 +60,7 @@ lp0	lda player,y
 
 	ldy #8
 	ldx x1
-lp1	lda player,y
+lp1	lda player1,y
 	sta p1,x
 	dex
 	dey
@@ -138,12 +138,17 @@ tok	lda clock
 	rts	
 .endp
 		
+
 		icl 'printf.asm'
+
 	
-player .byte $00,$00,$99,$BD,$FF,$BD,$99,$00,$00
+player0
+	.byte $00,$00,$99,$BD,$FF,$BD,$99,$00,$00
 x0	.byte $30
 y0	.byte $90
 c0	.byte $A8
+player1
+	.byte $00,$00,$18,$3C,$7E,$DB,$81,$00,$00
 x1	.byte $30
 y1	.byte $60
 c1	.byte $B8
