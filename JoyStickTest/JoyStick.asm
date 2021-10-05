@@ -45,31 +45,7 @@ cl0	sta	p0,y
 	dey
 	bne cl0
 
-loop					; move players
-	ldy #8
-	ldx x0
-lp0	lda player0,y
-	sta p0,x
-	dex
-	dey
-	bne lp0
-	lda y0
-	sta HPOSP0
-	lda c0
-	sta PCOLR0	
-
-	ldy #8
-	ldx x1
-lp1	lda player1,y
-	sta p1,x
-	dex
-	dey
-	bne lp1
-	lda y1
-	sta HPOSP1
-	lda c1
-	sta PCOLR1
-
+loop					
 	ldx #blue				; check button 0
 	lda STRIG0
 	bne lp2
@@ -94,10 +70,34 @@ lp3	stx c1
 	sty y1
 	stx x1
 	
+	
+	ldy #8					; update the players
+	ldx x0
+lp0	lda player0,y
+	sta p0,x
+	dex
+	dey
+	bne lp0
+	lda y0
+	sta HPOSP0
+	lda c0
+	sta PCOLR0	
+
+	ldy #8
+	ldx x1
+lp1	lda player1,y
+	sta p1,x
+	dex
+	dey
+	bne lp1
+	lda y1
+	sta HPOSP1
+	lda c1
+	sta PCOLR1
+	
 	jsr ticktock			; take a little break
 	
 	jmp loop				; main loop
-
 
 .proc checkStick			;up x-  down x+  left y-  right y+  
 	lsr					
