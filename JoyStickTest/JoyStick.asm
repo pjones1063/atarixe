@@ -22,7 +22,7 @@ start
     lda #$00
     sta color2
  	jsr printf
-	.byte 125,155,'XE Joy Stick Tester',0
+	.byte 125,155,'XE Joystick Tester',0
     
 	lda #>pmb 
 	sta PMBASE
@@ -134,7 +134,7 @@ tok lda clock
 	
 player .byte $00,$00,$99,$BD,$FF,$BD,$99,$00,$00
 x0  .byte $30
-y0  .byte $80
+y0  .byte $90
 c0  .byte $A8
 x1  .byte $30
 y1  .byte $60
