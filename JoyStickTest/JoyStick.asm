@@ -45,7 +45,7 @@ cl0	sta	p0,y
 	dey
 	bne cl0
 
-loop            		; move players
+loop					; move players
 	ldy #8
 	ldx x0
 lp0	lda player,y
@@ -99,20 +99,21 @@ lp3	stx c1
 	jmp loop				; main loop
 
 
-.proc checkStick
-	cmp #7					
-	bne st1
-	iny  
-st1	cmp #11
-	bne st2
+.proc checkStick			;up x-  down x+  left y-  right y+  
+	lsr					
+	bcs st1
+	dex  
+st1	lsr
+	bcs st2
+	inx 
+st2	lsr
+	bcs st3
 	dey 
-st2	cmp #14
-	bne st3
-	dex 
-st3	cmp #13
-	bne st4
-	inx  
-st4	cpy  #200
+st3	lsr
+	bcs st4
+	iny
+	  
+st4	cpy  #200			;test min / max
 	bcc xy1
 	ldy #200	 	
 xy1	cpy #47
