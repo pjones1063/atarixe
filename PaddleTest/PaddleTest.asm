@@ -41,7 +41,7 @@ start
 	ldy #$80			;clear out pmg buffer
 	lda #00	
 cl0	sta	p0,y
- 	sta	p1,y
+	sta	p1,y
 	dey
 	bne cl0
 	
@@ -66,9 +66,9 @@ loop
 	ldx #blue				; check paddle 0
 	lda PTRIG0
 	bne lp2
- 	ldx #yellow
+	ldx #yellow
 lp2	stx c0
-    stx PCOLR0
+	stx PCOLR0
 	ldy PADDL0
 	jsr checkPaddle
 	sty y0
@@ -77,13 +77,13 @@ lp2	stx c0
 	ldx #green				; paddle 1
 	lda PTRIG1
 	bne lp3
- 	ldx #yellow
+	ldx #yellow
 lp3	stx c1
-    stx PCOLR1     
+	stx PCOLR1     
 	ldy PADDL1
 	jsr checkPaddle
 	sty y1
-    sty HPOSP1
+	sty HPOSP1
 	
 	jsr ticktock			; take a little break
 	jmp loop				; main loop
