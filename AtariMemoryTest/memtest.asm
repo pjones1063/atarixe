@@ -21,6 +21,10 @@
 	org $3400
 	
 Start
+
+	lda #01
+	sta CRSINH
+	
 	jsr printf
 	.byte 125,155,'130 XE Extended Memory Test ',155, 155, 155,0
 	
@@ -122,6 +126,8 @@ ExitError:
 	jsr Printf
 	.byte 155,'Press a key to quit',155,0
 	jsr Input1
+	lda #00
+	sta CRSINH
 	jmp (DOSVEC)
 .endp
 	

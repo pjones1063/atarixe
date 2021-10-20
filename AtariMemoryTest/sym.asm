@@ -27,6 +27,7 @@ DBYTHI	equ $0309
 DAUX1	equ $030A
 DAUX2	equ $030B
 NOCKSM	equ $003C
+CRSINH  equ $02F0
 
 iccom	equ $0342
 icbadr	equ $0344
