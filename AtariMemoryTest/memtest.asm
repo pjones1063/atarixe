@@ -18,6 +18,7 @@
 
 	icl 	'sym.asm'	
 		
+		
 	org $3400
 	
 Start
