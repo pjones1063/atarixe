@@ -1,4 +1,4 @@
-;  printf.s - AspeQT printf library
+;  printf.s - AspeQT tiny printf library
 ;
 ;  Copyright (c) 2016 by Jonathan Halliday <fjc@atari8.co.uk>
 ;

@@ -25,11 +25,28 @@
 ;
 ;
 
+
+DDEVIC	equ $0300
+DUNIT	equ $0301
+DCOMND	equ $0302
+DSTATS	equ $0303
+DBUFLO	equ $0304
+DBUFHI	equ $0305
+DTIMLO	equ $0306
+DUNUSE	equ $0307
+DBYTLO	equ $0308
+DBYTHI	equ $0309
+DAUX1	equ $030A
+DAUX2	equ $030B
+NOCKSM	equ $003C
+CRSINH  equ $02F0
+
+
 SOURCE  EQU     $CB             ;zero page usage
 DEST    EQU     SOURCE+2
 DOSVEC	EQU     $0A
 DOSINI	EQU     $0C
-START   EQU     $2000           ;START address
+START   EQU     $3000           ;START address
 OSROM   EQU     $C000           ;address of OS ROM start
 OSRAM   EQU     $4000           ;address of ROM destination
 NMIEN   EQU     $D40E           ;NMI enable register
@@ -91,7 +108,7 @@ Enable  PLA
         STA     NMIEN           ;reestablish NMI mask
         PLP                     ;reenable IRQs
         
-        rts    
+        jmp (DOSVEC)    
         
         run     START
              
