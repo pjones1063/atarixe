@@ -23,8 +23,8 @@
 	
 Start
 
-    ldx #01
-    stx CRSINH
+	ldx #01
+	stx CRSINH
 
 	jsr printf
 	.byte 125,155,'130 XE Extended Memory Test ',155, 155, 155,0
